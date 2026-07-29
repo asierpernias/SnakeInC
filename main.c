@@ -145,7 +145,7 @@ int main()
     attron(A_BOLD);
     mvprintw(centroy -3 , centrox, "GAME OVER");
     attroff(A_BOLD);
-    mvprintw(centroy, centrox, "Puntaje: %d", longitud - 10);
+    mvprintw(centroy, centrox, "Puntuation: %d", longitud - 10);
     refresh();
     getch();
 
