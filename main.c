@@ -14,24 +14,38 @@ int main()
     cbreak();
     curs_set(0);
     keypad(stdscr, TRUE);
-    timeout(100);
 
-    int alive = 1;
+    int alive;
     int ANCHO = 100;
     int ALTO = 40;
-    int manzanas = 0;
+    int manzanas;
 
     struct Punto serpiente[256];
     struct Punto manzana;
-    int longitud = 10;
-    int dx = 1;
-    int dy = 0;
+    int longitud;
+    int dx;
+    int dy;
+
+    int highscore = 0;
+    int score;
+    int velocidad;
+
+inicio:
+
+    alive = 1;
+    manzanas = 1;
+    longitud = 10;
+    dx = 1;
+    dy = 0;
+    velocidad = 100;
+
     serpiente[0].x = ANCHO / 2;
     serpiente[0].y = ALTO / 2;
 
     manzana.x = rand() % (ANCHO - 2) + 1;
     manzana.y = rand() % (ALTO - 2) + 1;
-    manzanas = 1;
+
+    timeout(velocidad);
 
     while (alive != 0)
     {
@@ -97,12 +111,11 @@ int main()
 
         for (int i = longitud; i > 0; i--)
         {
-            serpiente[i].y = serpiente[i - 1].y;
-            serpiente[i].x = serpiente[i - 1].x;
+            serpiente[i] = serpiente[i - 1];
         }
 
-        serpiente[0].x = serpiente[0].x + dx;
-        serpiente[0].y = serpiente[0].y + dy;
+        serpiente[0].x += dx;
+        serpiente[0].y += dy;
 
         if (serpiente[0].x <= 0 || serpiente[0].x >= ANCHO - 1 ||
             serpiente[0].y <= 0 || serpiente[0].y >= ALTO - 1)
@@ -129,27 +142,62 @@ int main()
         {
             mvprintw(serpiente[i].y, serpiente[i].x, "0");
         }
-        mvprintw(1, 2, "  _____ _   _          _  ________");
-        mvprintw(2, 2, " / ____| \\ | |   /\\   | |/ /  ____|");
-        mvprintw(3, 2, "| (___ |  \\| |  /  \\  | ' /| |__  ");
-        mvprintw(4, 2, " \\___ \\| . ` | / /\\ \\ |  < |  __|  ");
-        mvprintw(5, 2, " ____) | |\\  |/ ____ \\| . \\| |____");
-        mvprintw(6, 2, "|_____/|_| \\_/_/    \\_\\_|\\__\\______|");
-        mvprintw(8, 2, "Score: %d", longitud - 10);
+
+        score = longitud - 10;
+        if (score > highscore)
+        {
+            highscore = score;
+        }
+
+        velocidad = 100 - score * 3;
+        if (velocidad < 30)
+        {
+            velocidad = 30;
+        }
+        timeout(velocidad);
+
+        mvprintw(ALTO + 1, 2, "  _____ _   _          _  ________");
+        mvprintw(ALTO + 2, 2, " / ____| \\ | |   /\\   | |/ /  ____|");
+        mvprintw(ALTO + 3, 2, "| (___ |  \\| |  /  \\  | ' /| |__");
+        mvprintw(ALTO + 4, 2, " \\___ \\| . ` | / /\\ \\ |  < |  __|");
+        mvprintw(ALTO + 5, 2, " ____) | |\\  |/ ____ \\| . \\| |____");
+        mvprintw(ALTO + 6, 2, "|_____/|_| \\_/_/    \\_\\_|\\__\\______|");
+
+        mvprintw(ALTO + 8, 2, "Score: %d", score);
+        mvprintw(ALTO + 9, 2, "Highscore: %d", highscore);
+        mvprintw(ALTO + 10, 2, "Speed: %d", 101 - velocidad);
+
         refresh();
+    }
+
+    if (longitud - 10 > highscore)
+    {
+        highscore = longitud - 10;
     }
 
     clear();
     int centrox = ANCHO / 2;
     int centroy = ALTO / 2;
     attron(A_BOLD);
-    mvprintw(centroy -3 , centrox, "GAME OVER");
+    mvprintw(centroy - 3, centrox, "GAME OVER");
     attroff(A_BOLD);
     mvprintw(centroy, centrox, "Score: %d", longitud - 10);
+    mvprintw(centroy + 1, centrox, "Highscore: %d", highscore);
+    mvprintw(centroy + 3, centrox, "Press ENTER to retry / SPACE to finish");
     refresh();
-    getch();
+    timeout(-1);
 
-    napms(6000);
+    int click = getch();
+
+    switch (click)
+    {
+    case '\n':
+    case KEY_ENTER:
+        goto inicio;
+    case ' ':
+        endwin();
+        return 0;
+    }
 
     endwin();
     return 0;
