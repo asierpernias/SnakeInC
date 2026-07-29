@@ -1,10 +1,12 @@
 #include <ncurses.h>
 #include <stdlib.h>
+
 struct Punto
 {
     int x;
     int y;
 };
+
 int main()
 {
     initscr();
@@ -13,20 +15,38 @@ int main()
     curs_set(0);
     keypad(stdscr, TRUE);
     timeout(100);
+
     int alive = 1;
     int ANCHO = 200;
     int ALTO = 40;
+    int manzanas = 0;
 
     struct Punto serpiente[256];
+    struct Punto manzana;
     int longitud = 10;
     int dx = 1;
-    int dy = 1;
+    int dy = 0;
     serpiente[0].x = ANCHO / 2;
     serpiente[0].y = ALTO / 2;
+
+    manzana.x = rand() % (ANCHO - 2) + 1;
+    manzana.y = rand() % (ALTO - 2) + 1;
+    mvprintw(manzana.y, manzana.x, "*");
+    manzanas = 1;
 
     while (alive != 0)
     {
         clear();
+
+        mvprintw(manzana.y, manzana.x, "*");
+
+        if (manzanas == 0)
+        {
+            manzana.x = rand() % (ANCHO - 2) + 1;
+            manzana.y = rand() % (ALTO - 2) + 1;
+            mvprintw(manzana.y, manzana.x, "*");
+            manzanas = 1;
+        }
 
         for (int y = 0; y < ALTO; y++)
         {
@@ -35,31 +55,21 @@ int main()
                 if (y == 0)
                 {
                     if (x == 0 || x == ANCHO - 1)
-                    {
                         mvprintw(y, x, "+");
-                    }
                     else
-                    {
                         mvprintw(y, x, "-");
-                    }
                 }
                 else if (y == ALTO - 1)
                 {
                     if (x == 0 || x == ANCHO - 1)
-                    {
                         mvprintw(y, x, "+");
-                    }
                     else
-                    {
                         mvprintw(y, x, "-");
-                    }
                 }
                 else
-                {
+                { 
                     if (x == 0 || x == ANCHO - 1)
-                    {
                         mvprintw(y, x, "|");
-                    }
                 }
             }
         }
@@ -70,15 +80,19 @@ int main()
         {
         case KEY_UP:
             dy = -1;
+            dx = 0;
             break;
         case KEY_DOWN:
             dy = 1;
+            dx = 0;
             break;
         case KEY_LEFT:
             dx = -1;
+            dy = 0;
             break;
         case KEY_RIGHT:
             dx = 1;
+            dy = 0;
             break;
         }
 
@@ -91,6 +105,27 @@ int main()
         serpiente[0].x = serpiente[0].x + dx;
         serpiente[0].y = serpiente[0].y + dy;
 
+        if (serpiente[0].x <= 0 || serpiente[0].x >= ANCHO - 1 ||
+            serpiente[0].y <= 0 || serpiente[0].y >= ALTO - 1)
+        {
+            alive = 0;
+        }
+
+        for (int i = 1; i < longitud; i++)
+        {
+            if (serpiente[0].x == serpiente[i].x &&
+                serpiente[0].y == serpiente[i].y)
+            {
+                alive = 0;
+            }
+        }
+
+        if (serpiente[0].x == manzana.x && serpiente[0].y == manzana.y)
+        {
+            longitud++;
+            manzanas = 0;
+        }
+
         for (int i = 0; i < longitud; i++)
         {
             mvprintw(serpiente[i].y, serpiente[i].x, "0");
@@ -98,5 +133,7 @@ int main()
 
         refresh();
     }
+
     endwin();
+    return 0;
 }
