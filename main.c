@@ -135,7 +135,7 @@ int main()
         mvprintw(4, 2, " \\___ \\| . ` | / /\\ \\ |  < |  __|  ");
         mvprintw(5, 2, " ____) | |\\  |/ ____ \\| . \\| |____");
         mvprintw(6, 2, "|_____/|_| \\_/_/    \\_\\_|\\__\\______|");
-        mvprintw(8, 2, "Puntuation: %d", longitud - 10);
+        mvprintw(8, 2, "Score: %d", longitud - 10);
         refresh();
     }
 
@@ -145,7 +145,7 @@ int main()
     attron(A_BOLD);
     mvprintw(centroy -3 , centrox, "GAME OVER");
     attroff(A_BOLD);
-    mvprintw(centroy, centrox, "Puntuation: %d", longitud - 10);
+    mvprintw(centroy, centrox, "Score: %d", longitud - 10);
     refresh();
     getch();
 
