@@ -1,4 +1,4 @@
-#include <ncurses.h>
+#include <curses.h>
 #include <stdlib.h>
 
 struct Punto
@@ -17,7 +17,7 @@ int main()
     timeout(100);
 
     int alive = 1;
-    int ANCHO = 200;
+    int ANCHO = 100;
     int ALTO = 40;
     int manzanas = 0;
 
@@ -31,11 +31,32 @@ int main()
 
     manzana.x = rand() % (ANCHO - 2) + 1;
     manzana.y = rand() % (ALTO - 2) + 1;
-    mvprintw(manzana.y, manzana.x, "*");
     manzanas = 1;
 
     while (alive != 0)
     {
+        int tecla = getch();
+
+        switch (tecla)
+        {
+        case KEY_UP:
+            dy = -1;
+            dx = 0;
+            break;
+        case KEY_DOWN:
+            dy = 1;
+            dx = 0;
+            break;
+        case KEY_LEFT:
+            dx = -1;
+            dy = 0;
+            break;
+        case KEY_RIGHT:
+            dx = 1;
+            dy = 0;
+            break;
+        }
+
         clear();
 
         mvprintw(manzana.y, manzana.x, "*");
@@ -67,33 +88,11 @@ int main()
                         mvprintw(y, x, "-");
                 }
                 else
-                { 
+                {
                     if (x == 0 || x == ANCHO - 1)
                         mvprintw(y, x, "|");
                 }
             }
-        }
-
-        int tecla = getch();
-
-        switch (tecla)
-        {
-        case KEY_UP:
-            dy = -1;
-            dx = 0;
-            break;
-        case KEY_DOWN:
-            dy = 1;
-            dx = 0;
-            break;
-        case KEY_LEFT:
-            dx = -1;
-            dy = 0;
-            break;
-        case KEY_RIGHT:
-            dx = 1;
-            dy = 0;
-            break;
         }
 
         for (int i = longitud; i > 0; i--)
@@ -130,9 +129,27 @@ int main()
         {
             mvprintw(serpiente[i].y, serpiente[i].x, "0");
         }
-
+        mvprintw(1, 2, "  _____ _   _          _  ________");
+        mvprintw(2, 2, " / ____| \\ | |   /\\   | |/ /  ____|");
+        mvprintw(3, 2, "| (___ |  \\| |  /  \\  | ' /| |__  ");
+        mvprintw(4, 2, " \\___ \\| . ` | / /\\ \\ |  < |  __|  ");
+        mvprintw(5, 2, " ____) | |\\  |/ ____ \\| . \\| |____");
+        mvprintw(6, 2, "|_____/|_| \\_/_/    \\_\\_|\\__\\______|");
+        mvprintw(8, 2, "Puntuation: %d", longitud - 10);
         refresh();
     }
+
+    clear();
+    int centrox = ANCHO / 2;
+    int centroy = ALTO / 2;
+    attron(A_BOLD);
+    mvprintw(centroy -3 , centrox, "GAME OVER");
+    attroff(A_BOLD);
+    mvprintw(centroy, centrox, "Puntaje: %d", longitud - 10);
+    refresh();
+    getch();
+
+    napms(6000);
 
     endwin();
     return 0;
